@@ -1,8 +1,9 @@
-# 🏢 Cyber-Physical System: Smart Room Monitoring & Control Platform
+# 🏢 Cyber-Physical System for Smart Room Monitoring & Control
+### MQTT-Based Publish-Subscribe Architecture using Python and Eclipse Mosquitto
 
-Beneath the cyber-physical loop, timing and reliability dictate system safety. Repositori ini berisi implementasi sistem **Cyber-Physical Systems (CPS)** untuk platform *Smart Room Monitoring & Control* menggunakan protokol **MQTT**, bahasa pemrograman **Python**, dan **Eclipse Mosquitto Broker**. 
+Cyber-Physical Systems require deterministic communication and reliable data exchange to maintain synchronization between cyber components and physical processes.
 
-Proyek ini mengintegrasikan representasi data fisik lingkungan nyata ke dalam ruang siber secara interaktif, paralel (*concurrent*), dan dinamis.
+Repositori ini berisi implementasi platform Smart Room Monitoring & Control berbasis Cyber-Physical System (CPS) menggunakan protokol MQTT, bahasa pemrograman Python, dan Eclipse Mosquitto Broker sebagai pusat komunikasi berbasis publish-subscribe.
 
 ---
 
@@ -27,9 +28,10 @@ Proyek ini mengintegrasikan representasi data fisik lingkungan nyata ke dalam ru
 ---
 
 ## 📝 Deskripsi Proyek
-Proyek ini dirancang untuk mensimulasikan lingkungan kamar pintar (*Smart Room*) di mana entitas fisik (suhu, kelembapan, status sakelar) dipetakan secara *real-time* ke dalam ruang siber melalui arsitektur jaringan terdistribusi berbasis **Publish-Subscribe**. 
+Platform ini mensimulasikan lingkungan Smart Room dengan memetakan entitas fisik berupa suhu ruangan, kelembapan, dan status aktuator lampu ke dalam ruang siber secara real-time melalui komunikasi MQTT. Sistem menerapkan paradigma Cyber-Physical System (CPS) yang mengintegrasikan proses sensing, komunikasi jaringan, dan monitoring secara kontinu dalam satu siklus closed-loop.
 
-Berbeda dengan sistem simulasi IoT standar, platform ini mengadopsi prinsip ketat perangkat lunak **Cyber-Physical Systems (CPS)**:
+Implementasi ini mengadopsi beberapa karakteristik utama Cyber-Physical System yang meliputi sinkronisasi temporal, komunikasi berbasis publish-subscribe, serta integrasi antara representasi fisik dan ruang siber secara kontinu:
+
 * **Determinisme Waktu (Temporal Constraints):** Pencatatan log waktu diperinci hingga tingkat **milidetik (milliseconds)** untuk validasi sinkronisasi temporal data fisik saat mengalir di ruang siber.
 * **Interaktivitas Jaringan:** Komponen *Subscriber* bertindak sebagai kontroler dinamis yang dilengkapi dengan antarmuka menu teks interaktif untuk mengubah parameter filter topik tanpa perlu memodifikasi kode program.
 * **Streaming Data Paralel:** Sisi *Publisher* mengadopsi metode *Streaming Mode* kontinu untuk memancarkan seluruh parameter sensor siber-fisik secara simultan guna membuktikan aspek *concurrency*.
@@ -45,6 +47,30 @@ Sistem komunikasi ini merepresentasikan siklus umpan balik (*closed-loop system*
         ▲                                                                          │
         └─────────────────(Actuation / QoS 2 Command)──────────────────────────────┘
 ```
+```text
++----------------------+
+| Physical Plant       |
+|----------------------|
+| Temperature Sensor   |
+| Humidity Sensor      |
+| Lamp Actuator        |
++----------+-----------+
+           |
+           | Publish JSON
+           v
++----------------------+
+| Eclipse Mosquitto    |
+| MQTT Broker          |
++----------+-----------+
+           |
+           | Routing
+           v
++----------------------+
+| Cyber Controller     |
+| subscriber.py        |
++----------------------+
+```
+
   - Physical Plant: Entitas fisik kamar pintar yang memancarkan parameter termal lingkungan.
 
   - Sensing & Telemetry: publisher.py melakukan digitalisasi dan serialisasi besaran analog menjadi objek terstruktur (JSON Payload).
@@ -100,6 +126,8 @@ git clone [https://github.com/username-kamu/CPS-MQTT-SmartRoom.git](https://gith
 cd CPS-MQTT-SmartRoom
 ```
 2. Instalasi Dependensi Jaringan Siber
+### Install dependency
+
 ```bash
 Instal library MQTT client resmi untuk Python melalui pip:
 ```
@@ -113,10 +141,33 @@ Pastikan layanan (service) Mosquitto Broker telah aktif berjalan di komputer lok
 # Menyalakan Mosquitto Service
 net start mosquitto
 ```
+Verifikasi broker telah aktif:
+```bash
+netstat -ano | findstr 1883
+```
 ---
 
 ## 🚀 Cara Menjalankan Simulasi
 Sistem ini diuji paling optimal menggunakan fitur terminal terintegrasi pada Visual Studio Code dengan memanfaatkan mekanisme Split Terminal demi menampilkan visualisasi data secara berdampingan.
+
+```text
+Subscriber
+↓
+
+Waiting...
+
+↓
+
+Publisher Start
+
+↓
+
+Broker Route
+
+↓
+
+Subscriber Receive
+```
 
 Langkah Eksekusi:
 1. Terminal Kiri (Cyber Controller): Jalankan entitas subscriber terlebih dahulu untuk mendengarkan jaringan:
