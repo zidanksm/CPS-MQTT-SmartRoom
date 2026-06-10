@@ -188,13 +188,13 @@ Langkah Eksekusi:
 ## 📸 Matriks Skenario & Analisis Pengujian
 📑 Ringkasan Pemenuhan Skenario Tugas Praktikum:
 
-    Skenario 1: Komunikasi dasar penukaran data dari publisher ke subscriber secara linear (Terpenuhi).
-
-    Skenario 2 & 3: Pengiriman pesan multi-topik dengan variasi QoS 0, 1, dan 2 secara paralel (Terpenuhi otomatis via Opsi 2 Publisher).
-
-    Skenario 4: Penggunaan Single-Level Wildcard + untuk menyaring tingkat hierarki tertentu (Terpenuhi melalui Opsi Menu 2 pada Subscriber).
-
-    Skenario 5: Penggunaan Multi-Level Wildcard # untuk menangkap seluruh data node secara masif (Terpenuhi melalui Opsi Menu 3 pada Subscriber).
+    | **Skenario Praktikum**                                              | **Implementasi pada Sistem**                                                                                                            | **Status**  |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
+| **Skenario 1 – Komunikasi Dasar Publisher–Broker–Subscriber**       | Tervalidasi pada pengujian **Menu 1** melalui komunikasi pada topik `smartroom/sensor/temperature`.                                     | ✅ Terpenuhi |
+| **Skenario 2 – Pengujian Quality of Service (QoS 0, QoS 1, QoS 2)** | Diamati melalui proses *Streaming Mode* Publisher yang mengirim seluruh topik menggunakan QoS berbeda pada setiap siklus pengiriman.    | ✅ Terpenuhi |
+| **Skenario 3 – Subscription Topik Spesifik**                        | Tervalidasi pada pengujian **Menu 1**, di mana Subscriber hanya menerima data dari topik `smartroom/sensor/temperature`.                | ✅ Terpenuhi |
+| **Skenario 4 – Penggunaan Single-Level Wildcard (`+`)**             | Tervalidasi pada pengujian **Menu 2** dengan *subscription* `smartroom/sensor/+` sehingga Subscriber menerima data suhu dan kelembapan. | ✅ Terpenuhi |
+| **Skenario 5 – Penggunaan Multi-Level Wildcard (`#`)**              | Tervalidasi pada pengujian **Menu 3** dengan *subscription* `smartroom/#` sehingga seluruh data Smart Room diterima secara bersamaan.   | ✅ Terpenuhi |
 
 ---
 ## 🖼️ Bukti Visual Dokumentasi Hasil Running
