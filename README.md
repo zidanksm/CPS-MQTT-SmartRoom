@@ -7,125 +7,6 @@ Repositori ini berisi implementasi platform Smart Room Monitoring & Control berb
 
 ---
 
-## 📌 Badges & Technologies
-![Python Version](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![MQTT Protocol](https://img.shields.io/badge/MQTT-v5.0%20%2F%20v3.1.1-660066?style=for-the-badge&logo=mqtt&logoColor=white)
-![Broker](https://img.shields.io/badge/Eclipse_Mosquitto-v2.x-3C5280?style=for-the-badge&logo=eclipse-mosquitto&logoColor=white)
-![Platform](https://img.shields.io/badge/Windows-x64-0078D4?style=for-the-badge&logo=windows&logoColor=white)
-
----
-
-## 📖 Daftar Isi (Table of Contents)
-
-1. [Deskripsi Proyek](#-deskripsi-proyek)
-2. [Arsitektur Siber-Fisik (CPS Closed-Loop)](#-arsitektur-siber-fisik-cps-closed-loop)
-3. [Spesifikasi Kontrak Data (JSON Payload Schema)](#-spesifikasi-kontrak-data-json-payload-schema)
-4. [Manajemen Topik & Matriks QoS](#️-manajemen-topik--matriks-qos)
-5. [Prasyarat Sistem](#-prasyarat-sistem)
-6. [Panduan Instalasi & Pengaturan](#️-panduan-instalasi--pengaturan)
-7. [Cara Menjalankan Simulasi](#-cara-menjalankan-simulasi)
-8. [Matriks Skenario Pengujian](#-matriks-skenario-pengujian)
-9. [Hasil Pengujian Sistem](#️-hasil-pengujian-sistem)
-10. [Hasil Implementasi](#-hasil-implementasi)
-11. [Struktur Repositori](#-struktur-repositori)
-12. [Kesimpulan](#-kesimpulan)
----
-
-## 📝 Deskripsi Proyek
-Platform ini mensimulasikan lingkungan Smart Room dengan memetakan entitas fisik berupa suhu ruangan, kelembapan, dan status aktuator lampu ke dalam ruang siber secara real-time melalui komunikasi MQTT. Sistem menerapkan paradigma Cyber-Physical System (CPS) yang mengintegrasikan proses sensing, komunikasi jaringan, dan monitoring secara kontinu dalam satu siklus closed-loop.
-
-Implementasi ini mengadopsi beberapa karakteristik utama Cyber-Physical System yang meliputi sinkronisasi temporal, komunikasi berbasis publish-subscribe, serta integrasi antara representasi fisik dan ruang siber secara kontinu:
-
-* **Determinisme Waktu (Temporal Constraints):** Pencatatan log waktu diperinci hingga tingkat **milidetik (milliseconds)** untuk validasi sinkronisasi temporal data fisik saat mengalir di ruang siber.
-* **Interaktivitas Jaringan:** Komponen *Subscriber* bertindak sebagai kontroler dinamis yang dilengkapi dengan antarmuka menu teks interaktif untuk mengubah parameter filter topik tanpa perlu memodifikasi kode program.
-* **Streaming Data Paralel:** Sisi *Publisher* mengadopsi metode *Streaming Mode* kontinu untuk memancarkan seluruh parameter sensor siber-fisik secara simultan guna membuktikan aspek *concurrency*.
-
----
-
-## 🔄 Arsitektur Siber-Fisik (CPS Closed-Loop)
-Sistem komunikasi ini merepresentasikan siklus umpan balik (*closed-loop system*) yang terintegrasi:
-
-```text
-+----------------------+
-| Physical Plant       |
-|----------------------|
-| Temperature Sensor   |
-| Humidity Sensor      |
-| Lamp Actuator        |
-+----------+-----------+
-           |
-           | Publish JSON
-           v
-+----------------------+
-| Eclipse Mosquitto    |
-| MQTT Broker          |
-+----------+-----------+
-           |
-           | Routing
-           v
-+----------------------+
-| Cyber Controller     |
-| subscriber.py        |
-+----------------------+
-```
-
-  - Physical Plant: Entitas fisik kamar pintar yang memancarkan parameter termal lingkungan.
-
-  - Sensing & Telemetry: publisher.py melakukan digitalisasi dan serialisasi besaran analog menjadi objek terstruktur (JSON Payload).
-
-  - Cyber Network: Mosquitto Broker mengelola tabel routing data siber dan menjaga keandalan paket berdasarkan tingkat QoS.
-
-  - Cyber Controller: subscriber.py menangkap, melakukan parsing JSON, dan menganalisis aliran data masuk untuk kebutuhan monitoring ataupun keputusan aktuasi sakelar.
-
----
-
-## 📄 Spesifikasi Kontrak Data (JSON Payload Schema)
-
-Seluruh data pada sistem dikirim menggunakan format **JavaScript Object Notation (JSON)** sebagai media pertukaran data antara Publisher dan Subscriber. Penggunaan JSON memungkinkan representasi data yang terstruktur, ringan, mudah diproses, serta mendukung interoperabilitas antar komponen pada sistem Cyber-Physical System (CPS).
-
-### Sensor Suhu
-
-```json
-{
-  "sensor": "suhu",
-  "value": 25.68,
-  "unit": "C"
-}
-```
-
-### Sensor Kelembapan
-
-```json
-{
-  "sensor": "kelembapan",
-  "value": 61.43,
-  "unit": "%"
-}
-```
-
-### Aktuator Lampu
-
-```json
-{
-  "device": "lampu_utama",
-  "command": "ON"
-}
-```
-
----
-
-## ⚙️ Manajemen Topik & Matriks QoS
-Penentuan tingkat Quality of Service (QoS) disesuaikan secara logis berdasarkan karakteristik kekritisan data (data criticality) pada sistem siber-fisik:
-
-
-| No | Entitas Fisik     | Topik MQTT                     | Level QoS | Justifikasi Karakteristik Data                                                                                                                                                                                             |
-| -- | ----------------- | ------------------------------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1  | Sensor Suhu       | `smartroom/sensor/temperature` | QoS 0     | **At Most Once.** Data dikirim secara periodik dan kontinu. Kehilangan satu sampel data tidak akan mengganggu stabilitas kontrol sistem siber.                                                                             |
-| 2  | Sensor Kelembapan | `smartroom/sensor/humidity`    | QoS 1     | **At Least Once.** Menjamin data kelembapan lingkungan tersampaikan ke pusat siber minimal satu kali melalui mekanisme handshake paket `PUBACK`.                                                                           |
-| 3  | Aktuator Lampu    | `smartroom/control/lamp`       | QoS 2     | **Exactly Once.** Bersifat *safety-critical*. Instruksi sakelar fisik harus dieksekusi tepat satu kali untuk menghindari kondisi desinkronisasi status fisik yang dapat menyebabkan perilaku sistem yang tidak diinginkan. |
-
----
-
 ## 💻 Prasyarat Sistem
 Sebelum mengeksekusi program, pastikan lingkungan lokal Anda memenuhi spesifikasi berikut:
 
@@ -237,6 +118,126 @@ Subscriber Receives Data
 ```
 
 Selama simulasi berlangsung, data akan diteruskan oleh Mosquitto Broker sesuai mekanisme **topic filtering**, **hierarchical topic**, dan **Quality of Service (QoS)** yang diterapkan pada sistem Smart Room.
+
+---
+
+## 📌 Badges & Technologies
+![Python Version](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![MQTT Protocol](https://img.shields.io/badge/MQTT-v5.0%20%2F%20v3.1.1-660066?style=for-the-badge&logo=mqtt&logoColor=white)
+![Broker](https://img.shields.io/badge/Eclipse_Mosquitto-v2.x-3C5280?style=for-the-badge&logo=eclipse-mosquitto&logoColor=white)
+![Platform](https://img.shields.io/badge/Windows-x64-0078D4?style=for-the-badge&logo=windows&logoColor=white)
+
+---
+
+## 📖 Daftar Isi (Table of Contents)
+
+1. [Prasyarat Sistem](#-prasyarat-sistem)
+2. [Panduan Instalasi & Pengaturan](#️-panduan-instalasi--pengaturan)
+3. [Cara Menjalankan Simulasi](#-cara-menjalankan-simulasi)
+4. [Deskripsi Proyek](#-deskripsi-proyek)
+5. [Arsitektur Siber-Fisik (CPS Closed-Loop)](#-arsitektur-siber-fisik-cps-closed-loop)
+6. [Spesifikasi Kontrak Data (JSON Payload Schema)](#-spesifikasi-kontrak-data-json-payload-schema)
+7. [Manajemen Topik & Matriks QoS](#️-manajemen-topik--matriks-qos)
+8. [Matriks Skenario Pengujian](#-matriks-skenario-pengujian)
+9. [Hasil Pengujian Sistem](#️-hasil-pengujian-sistem)
+10. [Hasil Implementasi](#-hasil-implementasi)
+11. [Struktur Repositori](#-struktur-repositori)
+12. [Kesimpulan](#-kesimpulan)
+
+---
+
+## 📝 Deskripsi Proyek
+Platform ini mensimulasikan lingkungan Smart Room dengan memetakan entitas fisik berupa suhu ruangan, kelembapan, dan status aktuator lampu ke dalam ruang siber secara real-time melalui komunikasi MQTT. Sistem menerapkan paradigma Cyber-Physical System (CPS) yang mengintegrasikan proses sensing, komunikasi jaringan, dan monitoring secara kontinu dalam satu siklus closed-loop.
+
+Implementasi ini mengadopsi beberapa karakteristik utama Cyber-Physical System yang meliputi sinkronisasi temporal, komunikasi berbasis publish-subscribe, serta integrasi antara representasi fisik dan ruang siber secara kontinu:
+
+* **Determinisme Waktu (Temporal Constraints):** Pencatatan log waktu diperinci hingga tingkat **milidetik (milliseconds)** untuk validasi sinkronisasi temporal data fisik saat mengalir di ruang siber.
+* **Interaktivitas Jaringan:** Komponen *Subscriber* bertindak sebagai kontroler dinamis yang dilengkapi dengan antarmuka menu teks interaktif untuk mengubah parameter filter topik tanpa perlu memodifikasi kode program.
+* **Streaming Data Paralel:** Sisi *Publisher* mengadopsi metode *Streaming Mode* kontinu untuk memancarkan seluruh parameter sensor siber-fisik secara simultan guna membuktikan aspek *concurrency*.
+
+---
+
+## 🔄 Arsitektur Siber-Fisik (CPS Closed-Loop)
+Sistem komunikasi ini merepresentasikan siklus umpan balik (*closed-loop system*) yang terintegrasi:
+
+```text
++----------------------+
+| Physical Plant       |
+|----------------------|
+| Temperature Sensor   |
+| Humidity Sensor      |
+| Lamp Actuator        |
++----------+-----------+
+           |
+           | Publish JSON
+           v
++----------------------+
+| Eclipse Mosquitto    |
+| MQTT Broker          |
++----------+-----------+
+           |
+           | Routing
+           v
++----------------------+
+| Cyber Controller     |
+| subscriber.py        |
++----------------------+
+```
+
+  - Physical Plant: Entitas fisik kamar pintar yang memancarkan parameter termal lingkungan.
+
+  - Sensing & Telemetry: publisher.py melakukan digitalisasi dan serialisasi besaran analog menjadi objek terstruktur (JSON Payload).
+
+  - Cyber Network: Mosquitto Broker mengelola tabel routing data siber dan menjaga keandalan paket berdasarkan tingkat QoS.
+
+  - Cyber Controller: subscriber.py menangkap, melakukan parsing JSON, dan menganalisis aliran data masuk untuk kebutuhan monitoring ataupun keputusan aktuasi sakelar.
+
+---
+
+## 📄 Spesifikasi Kontrak Data (JSON Payload Schema)
+
+Seluruh data pada sistem dikirim menggunakan format **JavaScript Object Notation (JSON)** sebagai media pertukaran data antara Publisher dan Subscriber. Penggunaan JSON memungkinkan representasi data yang terstruktur, ringan, mudah diproses, serta mendukung interoperabilitas antar komponen pada sistem Cyber-Physical System (CPS).
+
+### Sensor Suhu
+
+```json
+{
+  "sensor": "suhu",
+  "value": 25.68,
+  "unit": "C"
+}
+```
+
+### Sensor Kelembapan
+
+```json
+{
+  "sensor": "kelembapan",
+  "value": 61.43,
+  "unit": "%"
+}
+```
+
+### Aktuator Lampu
+
+```json
+{
+  "device": "lampu_utama",
+  "command": "ON"
+}
+```
+
+---
+
+## ⚙️ Manajemen Topik & Matriks QoS
+Penentuan tingkat Quality of Service (QoS) disesuaikan secara logis berdasarkan karakteristik kekritisan data (data criticality) pada sistem siber-fisik:
+
+
+| No | Entitas Fisik     | Topik MQTT                     | Level QoS | Justifikasi Karakteristik Data                                                                                                                                                                                             |
+| -- | ----------------- | ------------------------------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1  | Sensor Suhu       | `smartroom/sensor/temperature` | QoS 0     | **At Most Once.** Data dikirim secara periodik dan kontinu. Kehilangan satu sampel data tidak akan mengganggu stabilitas kontrol sistem siber.                                                                             |
+| 2  | Sensor Kelembapan | `smartroom/sensor/humidity`    | QoS 1     | **At Least Once.** Menjamin data kelembapan lingkungan tersampaikan ke pusat siber minimal satu kali melalui mekanisme handshake paket `PUBACK`.                                                                           |
+| 3  | Aktuator Lampu    | `smartroom/control/lamp`       | QoS 2     | **Exactly Once.** Bersifat *safety-critical*. Instruksi sakelar fisik harus dieksekusi tepat satu kali untuk menghindari kondisi desinkronisasi status fisik yang dapat menyebabkan perilaku sistem yang tidak diinginkan. |
 
 ---
 
