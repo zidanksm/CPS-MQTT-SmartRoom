@@ -110,17 +110,22 @@ Sistem ini diuji paling optimal menggunakan fitur terminal terintegrasi pada Vis
 Langkah Eksekusi:
 1. Terminal Kiri (Cyber Controller): Jalankan entitas subscriber terlebih dahulu untuk mendengarkan jaringan:
 
-  python subscriber.py
-  Terminal akan memunculkan pilihan menu interaktif (1/2/3). Pilih skenario wildcard yang ingin Anda uji.
+```bash
+python subscriber.py
+```
+Terminal akan memunculkan pilihan menu interaktif (1/2/3). Pilih skenario wildcard yang ingin Anda uji.
 
 2. Terminal Kanan (Physical Plant): Jalankan simulator lingkungan fisik publisher:
 
-  python publisher.py
-  Publisher akan langsung otomatis berada dalam Streaming Mode dan memancarkan seluruh topik data.
+```bash
+python publisher.py
+```
+Publisher akan langsung otomatis berada dalam Streaming Mode dan memancarkan seluruh topik data.
 
 ---
 ## 📸 Matriks Skenario & Analisis Pengujian
-📑 Ringkasan Pemenuhan Skenario Tugas Praktikum
+📑 Ringkasan Pemenuhan Skenario Tugas Praktikum:
+
 Skenario 1: Komunikasi dasar penukaran data dari publisher ke subscriber secara linear (Terpenuhi).
 
 Skenario 2 & 3: Pengiriman pesan multi-topik dengan variasi QoS 0, 1, dan 2 secara paralel (Terpenuhi otomatis via Opsi 2 Publisher).
@@ -131,13 +136,16 @@ Skenario 5: Penggunaan Multi-Level Wildcard # untuk menangkap seluruh data node 
 
 ---
 ## 🖼️ Bukti Visual Dokumentasi Hasil Running
-1. Skenario 1 & 3: Pengujian Target Topik Spesifik (Hanya Jalur Sensor Suhu)
+1. Skenario 1 & 3: Pengujian Target Topik Spesifik (Hanya Jalur Sensor Suhu)<img width="1867" height="1032" alt="Screenshot 2026-06-10 182438" src="https://github.com/user-attachments/assets/3c4c21a5-a695-4dd7-b7d5-01fffd8ca615" />
+
 Analisis Teknis: Pada kondisi pengujian ini, komponen Subscriber memilih opsi menu 1 (smartroom/sensor/temperature). Meskipun Publisher memancarkan data sensor kelembapan dan perintah kontrol lampu secara masif (seperti yang terlihat pada log terminal kanan), broker secara cerdas menyaring data tersebut sehingga Subscriber hanya menerima pesan dari kluster temperatur dengan tingkat keandalan QoS 0.
 
-2. Skenario 4: Pengujian Penyaringan Kluster Sensor (Single-Level Wildcard +)
+2. Skenario 4: Pengujian Penyaringan Kluster Sensor (Single-Level Wildcard +) <img width="1868" height="1034" alt="Screenshot 2026-06-10 182251" src="https://github.com/user-attachments/assets/089c3b65-4009-465c-80e3-d61959898bb4" />
+
 Analisis Teknis: Pada kondisi pengujian ini, Subscriber memilih opsi menu 2 (smartroom/sensor/+). Berdasarkan aturan arsitektur pola routing tree MQTT, karakter wildcard + mengisolasi pencarian hanya pada satu tingkat folder folder. Log terminal siber membuktikan bahwa data smartroom/sensor/temperature (QoS 0) dan smartroom/sensor/humidity (QoS 1) berhasil ditangkap secara bergantian, sementara data aktuasi lampu (smartroom/control/lamp) sepenuhnya disaring keluar dari sistem karena berada pada struktur cabang hierarki yang berbeda.
 
-3. Skenario 5: Pengujian Menangkap Seluruh Data Ruangan (Multi-Level Wildcard #)
+3. Skenario 5: Pengujian Menangkap Seluruh Data Ruangan (Multi-Level Wildcard #)  <img width="1869" height="1037" alt="Screenshot 2026-06-10 182129" src="https://github.com/user-attachments/assets/7ada4018-942d-4fe9-8013-0ddc9cbc9216" />
+
 Analisis Teknis: Pada kondisi pengujian ini, Subscriber memilih opsi menu 3 (smartroom/#). Sesuai dengan spesifikasi pola routing MQTT, wildcard # bersifat multi-level yang mampu menangkap seluruh data tanpa batasan tingkatan hierarki folder di bawah node utama. Log terminal siber membuktikan bahwa seluruh aliran data, baik sensor suhu (QoS 0), kelembapan (QoS 1), hingga perintah kontrol lampu (QoS 2), berhasil diterima secara paralel, simultan, dan lengkap.
 
 ---
