@@ -136,70 +136,96 @@ Sebelum mengeksekusi program, pastikan lingkungan lokal Anda memenuhi spesifikas
 
 ## 🛠️ Panduan Instalasi & Pengaturan
 
-1. Kloning Repositori
-Buka Terminal/CMD Anda, arahkan ke direktori lokal, lalu jalankan perintah:
+Sebelum menjalankan simulasi, pastikan seluruh dependensi perangkat lunak telah terpasang dan layanan MQTT Broker dapat berjalan dengan baik pada lingkungan lokal.
+
+### 1. Clone Repository
+
 ```bash
-git clone [https://github.com/username-kamu/CPS-MQTT-SmartRoom.git](https://github.com/username-kamu/CPS-MQTT-SmartRoom.git)
+git clone https://github.com/username-kamu/CPS-MQTT-SmartRoom.git
 cd CPS-MQTT-SmartRoom
 ```
-2. Instalasi Dependensi Jaringan Siber
-### Install Python Dependency
+
+### 2. Install Python Dependency
+
+Install library MQTT Client untuk Python menggunakan perintah berikut:
 
 ```bash
 pip install paho-mqtt
 ```
 
-3. Konfigurasi & Menjalankan Mosquitto Broker
-Pastikan layanan (service) Mosquitto Broker telah aktif berjalan di komputer lokal Anda pada port 1883. Untuk mematikan atau menyalakannya kembali di Windows, gunakan perintah administrator berikut:
+### 3. Menjalankan Eclipse Mosquitto Broker
+
+Pastikan **Eclipse Mosquitto Broker** telah terinstal dan berjalan pada **port 1883**.
+
+Untuk menjalankan service Mosquitto pada Windows:
+
 ```bash
-# Menyalakan Mosquitto Service
 net start mosquitto
 ```
-Verifikasi broker telah aktif:
+
+Verifikasi bahwa broker telah aktif:
+
 ```bash
 netstat -ano | findstr 1883
 ```
+
+Apabila broker berhasil berjalan, sistem siap digunakan untuk proses komunikasi MQTT berbasis **Publish–Subscribe**.
+
 ---
 
 ## 🚀 Cara Menjalankan Simulasi
-Sistem ini diuji paling optimal menggunakan fitur terminal terintegrasi pada Visual Studio Code dengan memanfaatkan mekanisme Split Terminal demi menampilkan visualisasi data secara berdampingan.
 
-```text
-+------------------+
-| subscriber.py    |
-| (Listening Mode) |
-+--------+---------+
-         |
-         |
-         v
-+------------------+
-| Mosquitto Broker |
-+--------+---------+
-         ^
-         |
-         |
-+--------+---------+
-| publisher.py     |
-| (Streaming Mode) |
-+------------------+
+Simulasi direkomendasikan menggunakan **Visual Studio Code Split Terminal** atau beberapa terminal terpisah sehingga proses Publisher dan Subscriber dapat diamati secara bersamaan (*real-time*).
+
+### Langkah 1 — Jalankan Subscriber
+
+Pada terminal pertama, jalankan:
+
+```bash
+python subscriber.py
 ```
 
-Langkah Eksekusi:
-1. Terminal Kiri (Cyber Controller): Jalankan entitas subscriber terlebih dahulu untuk mendengarkan jaringan:
+Program akan menampilkan menu interaktif:
 
-  ```bash
-  python subscriber.py
-  ```
-  Terminal akan memunculkan pilihan menu interaktif (1/2/3). Pilih skenario wildcard yang ingin Anda uji.
+```text
+1. smartroom/sensor/temperature
+2. smartroom/sensor/+
+3. smartroom/#
+```
 
-2. Terminal Kanan (Physical Plant): Jalankan simulator lingkungan fisik publisher:
+Pilih mode *subscription* sesuai skenario pengujian yang ingin dilakukan.
 
-  ```bash
-  python publisher.py
-  ```
-  Publisher akan langsung otomatis berada dalam Streaming Mode dan memancarkan seluruh topik data.
+### Langkah 2 — Jalankan Publisher
 
----
+Pada terminal kedua, jalankan:
+
+```bash
+python publisher.py
+```
+
+Publisher akan memasuki **Streaming Mode** dan secara periodik mempublikasikan seluruh data Smart Room menggunakan format **JSON Payload** dengan variasi **QoS 0, QoS 1, dan QoS 2**.
+
+### Alur Eksekusi
+
+```text
+Start Mosquitto Broker
+           │
+           ▼
+Run subscriber.py
+(Select Menu 1 / 2 / 3)
+           │
+           ▼
+Run publisher.py
+(Streaming Mode)
+           │
+           ▼
+MQTT Broker Routing
+           │
+           ▼
+Subscriber Receives Data
+```
+
+Selama simulasi berlangsung, data akan diteruskan oleh Mosquitto Broker sesuai mekanisme **topic filtering**, **hierarchical topic**, dan **Quality of Service (QoS)** yang diterapkan pada sistem Smart Room.
 ## 📸 Matriks Skenario Pengujian
 
 Pengujian sistem mengacu pada lima skenario yang ditetapkan pada modul praktikum MQTT. Implementasi yang dikembangkan menggunakan **satu program Publisher** yang mempublikasikan seluruh data Smart Room secara kontinu dengan variasi **QoS 0, QoS 1, dan QoS 2**, serta **satu program Subscriber** yang menyediakan tiga mode *subscription* (topik spesifik, wildcard `+`, dan wildcard `#`). Dengan rancangan tersebut, beberapa skenario praktikum dapat divalidasi dalam satu proses pengujian sehingga seluruh kebutuhan praktikum tetap terpenuhi melalui **tiga kali pengujian**.
@@ -271,19 +297,21 @@ Subscriber berhasil menerima seluruh data Smart Room yang berada di bawah prefik
 
 ## ✅ Hasil Implementasi
 
-Seluruh fitur utama sistem berhasil diimplementasikan dan diuji, meliputi:
+Fitur-fitur yang berhasil diimplementasikan pada sistem **Smart Room Monitoring & Control** meliputi:
 
-- ✅ Publish-Subscribe Communication
-- ✅ Multiple MQTT Topics
-- ✅ Quality of Service (QoS 0, QoS 1, QoS 2)
-- ✅ Topic Filtering
-- ✅ Single-Level Wildcard (`+`)
-- ✅ Multi-Level Wildcard (`#`)
-- ✅ JSON Payload Communication
-- ✅ Millisecond Timestamp Logging
-- ✅ Continuous Streaming Mode
-- ✅ Interactive Subscriber Menu
-- ✅ Smart Room Monitoring & Control Simulation
+- [x] Publish–Subscribe Communication
+- [x] Multiple MQTT Topics
+- [x] Hierarchical Topic Namespace
+- [x] Quality of Service (QoS 0, QoS 1, QoS 2)
+- [x] Topic Filtering Mechanism
+- [x] Single-Level Wildcard (`+`)
+- [x] Multi-Level Wildcard (`#`)
+- [x] JSON Payload Communication
+- [x] Millisecond Timestamp Logging
+- [x] Continuous Streaming Mode
+- [x] Interactive Subscriber Menu
+- [x] Real-Time Smart Room Monitoring
+- [x] Smart Room Monitoring & Control Simulation
 
 ## 📂 Struktur Repositori
 
