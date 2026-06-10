@@ -59,6 +59,12 @@ Cyber Controller: subscriber.py menangkap, melakukan parsing JSON, dan menganali
 Penentuan tingkat Quality of Service (QoS) disesuaikan secara logis berdasarkan karakteristik kekritisan data (data criticality) pada sistem siber-fisik:
 
 
+| No | Entitas Fisik     | Topik MQTT                     | Level QoS | Justifikasi Karakteristik Data                                                                                                                                                                                             |
+| -- | ----------------- | ------------------------------ | --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1  | Sensor Suhu       | `smartroom/sensor/temperature` | QoS 0     | **At Most Once.** Data dikirim secara periodik dan kontinu. Kehilangan satu sampel data tidak akan mengganggu stabilitas kontrol sistem siber.                                                                             |
+| 2  | Sensor Kelembapan | `smartroom/sensor/humidity`    | QoS 1     | **At Least Once.** Menjamin data kelembapan lingkungan tersampaikan ke pusat siber minimal satu kali melalui mekanisme handshake paket `PUBACK`.                                                                           |
+| 3  | Aktuator Lampu    | `smartroom/control/lamp`       | QoS 2     | **Exactly Once.** Bersifat *safety-critical*. Instruksi sakelar fisik harus dieksekusi tepat satu kali untuk menghindari kondisi desinkronisasi status fisik yang dapat menyebabkan perilaku sistem yang tidak diinginkan. |
+
 ---
 
 ## 💻 Prasyarat Sistem
@@ -125,11 +131,14 @@ Skenario 5: Penggunaan Multi-Level Wildcard # untuk menangkap seluruh data node 
 
 ---
 ## 🖼️ Bukti Visual Dokumentasi Hasil Running
-1. Skenario Pengujian Gabungan Utama (Skenario 1, 2, 3, dan Skenario 5: Wildcard #)
-Analisis Teknis: Pada kondisi pengujian ini, Subscriber memilih opsi menu 3 (smartroom/#). Hasil log terminal di bawah menunjukkan data Suhu (QoS 0), Kelembapan (QoS 1), dan Perintah Aktuasi Lampu (QoS 2) berhasil diterima secara simultan dan real-time. Keberadaan log waktu hingga milidetik yang berjalan sinkron dengan jam lokal komputer membuktikan pemenuhan aspek determinisme waktu sistem.
+1. Skenario 1 & 3: Pengujian Target Topik Spesifik (Hanya Jalur Sensor Suhu)
+Analisis Teknis: Pada kondisi pengujian ini, komponen Subscriber memilih opsi menu 1 (smartroom/sensor/temperature). Meskipun Publisher memancarkan data sensor kelembapan dan perintah kontrol lampu secara masif (seperti yang terlihat pada log terminal kanan), broker secara cerdas menyaring data tersebut sehingga Subscriber hanya menerima pesan dari kluster temperatur dengan tingkat keandalan QoS 0.
 
-2. Skenario Pengujian Penyaringan Topik (Skenario 4: Wildcard +)
-Analisis Teknis: Pada kondisi pengujian ini, Subscriber memilih opsi menu 2 (smartroom/sensor/+). Sesuai dengan spesifikasi pola routing tree MQTT, tanda + bertindak sebagai filter satu tingkatan level folder. Sistem terbukti hanya meloloskan payload data dari topik smartroom/sensor/temperature dan smartroom/sensor/humidity. Data dari topik kontrol aktuator (smartroom/control/lamp) secara otomatis disaring keluar dari sistem monitor siber karena berada di luar batas level hierarki sensor.
+2. Skenario 4: Pengujian Penyaringan Kluster Sensor (Single-Level Wildcard +)
+Analisis Teknis: Pada kondisi pengujian ini, Subscriber memilih opsi menu 2 (smartroom/sensor/+). Berdasarkan aturan arsitektur pola routing tree MQTT, karakter wildcard + mengisolasi pencarian hanya pada satu tingkat folder folder. Log terminal siber membuktikan bahwa data smartroom/sensor/temperature (QoS 0) dan smartroom/sensor/humidity (QoS 1) berhasil ditangkap secara bergantian, sementara data aktuasi lampu (smartroom/control/lamp) sepenuhnya disaring keluar dari sistem karena berada pada struktur cabang hierarki yang berbeda.
+
+3. Skenario 5: Pengujian Menangkap Seluruh Data Ruangan (Multi-Level Wildcard #)
+Analisis Teknis: Pada kondisi pengujian ini, Subscriber memilih opsi menu 3 (smartroom/#). Sesuai dengan spesifikasi pola routing MQTT, wildcard # bersifat multi-level yang mampu menangkap seluruh data tanpa batasan tingkatan hierarki folder di bawah node utama. Log terminal siber membuktikan bahwa seluruh aliran data, baik sensor suhu (QoS 0), kelembapan (QoS 1), hingga perintah kontrol lampu (QoS 2), berhasil diterima secara paralel, simultan, dan lengkap.
 
 ---
 
