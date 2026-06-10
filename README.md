@@ -44,3 +44,20 @@ Sistem komunikasi ini merepresentasikan siklus umpan balik (*closed-loop system*
   (Kamar Pintar)                             (Mosquitto)                   (Interactive Sub)
         ▲                                                                          │
         └─────────────────(Actuation / QoS 2 Command)──────────────────────────────┘
+```
+Physical Plant: Entitas fisik kamar pintar yang memancarkan parameter termal lingkungan.
+
+Sensing & Telemetry: publisher.py melakukan digitalisasi dan serialisasi besaran analog menjadi objek terstruktur (JSON Payload).
+
+Cyber Network: Mosquitto Broker mengelola tabel routing data siber dan menjaga keandalan paket berdasarkan tingkat QoS.
+
+Cyber Controller: subscriber.py menangkap, melakukan parsing JSON, dan menganalisis aliran data masuk untuk kebutuhan monitoring ataupun keputusan aktuasi sakelar.
+
+---
+
+## ⚙️ Manajemen Topik & Matriks QoS
+Penentuan tingkat Quality of Service (QoS) disesuaikan secara logis berdasarkan karakteristik kekritisan data (data criticality) pada sistem siber-fisik:
+No,Entitas Fisik,Topik MQTT,Level QoS,Justifikasi Karakteristik Data
+1,Sensor Suhu,smartroom/sensor/temperature,QoS 0,At Most Once. Bersifat periodik kontinu. Kehilangan satu sampel data (data loss) tidak akan mengganggu stabilitas kontrol sistem siber.
+2,Sensor Kelembapan,smartroom/sensor/humidity,QoS 1,At Least Once. Menjamin data kelembapan lingkungan tersampaikan ke pusat siber minimal satu kali melalui mekanisme handshake paket PUBACK.
+3,Aktuator Lampu,smartroom/control/lamp,QoS 2,Exactly Once. Bersifat Safety-Critical. Instruksi sakelar fisik wajib dieksekusi tepat satu kali untuk menghindari kondisi desinkronisasi status fisik yang berbahaya.
