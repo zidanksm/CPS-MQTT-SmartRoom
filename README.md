@@ -202,9 +202,11 @@ Pengujian sistem mengacu pada lima skenario yang ditetapkan pada modul praktikum
 ---
 ---
 
+---
+
 ## 🖼️ Hasil Pengujian Sistem
 
-Implementasi sistem berhasil memvalidasi seluruh skenario praktikum MQTT melalui **tiga proses pengujian**, di mana beberapa skenario dapat direalisasikan dalam satu eksekusi karena Publisher melakukan *streaming* seluruh topik secara simultan dan Subscriber menyediakan beberapa mode *subscription*.
+Implementasi sistem berhasil memvalidasi seluruh skenario praktikum MQTT melalui **tiga kali proses pengujian**, di mana beberapa skenario dapat direalisasikan dalam satu eksekusi karena Publisher melakukan *streaming* seluruh topik secara simultan dan Subscriber menyediakan beberapa mode *subscription*.
 
 ### 1️⃣ Pengujian Topik Spesifik (`smartroom/sensor/temperature`)
 **Merepresentasikan Skenario 1 (Komunikasi Dasar) dan Skenario 3 (Subscription Topik Spesifik).**
@@ -217,25 +219,38 @@ Subscriber hanya menerima data pada topik `smartroom/sensor/temperature` meskipu
 
 ---
 
-### 2️⃣ Pengujian Single-Level Wildcard (`smartroom/sensor/+`)
+### 2️⃣ Pengujian Quality of Service (QoS 0, QoS 1, dan QoS 2)
+**Merepresentasikan Skenario 2 (Perbandingan Quality of Service).**
+
+<img width="1867" height="1032" alt="Screenshot 2026-06-10 182438" src="https://github.com/user-attachments/assets/3c4c21a5-a695-4dd7-b7d5-01fffd8ca615" />
+
+**Hasil Pengujian**
+
+Selama proses *Streaming Mode*, Publisher mempublikasikan data suhu menggunakan **QoS 0**, data kelembapan menggunakan **QoS 1**, dan data kontrol lampu menggunakan **QoS 2**. Log Publisher menampilkan label `[QoS 0]`, `[QoS 1]`, dan `[QoS 2]` pada setiap siklus pengiriman sehingga implementasi variasi **Quality of Service** dapat diamati secara langsung sesuai karakteristik masing-masing tingkat keandalan.
+
+> **Catatan:** Pengujian QoS tervalidasi melalui log Publisher yang muncul selama proses streaming sehingga tidak memerlukan dokumentasi visual terpisah. Screenshot yang digunakan merupakan proses eksekusi yang sama dengan pengujian komunikasi dasar.
+
+---
+
+### 3️⃣ Pengujian Single-Level Wildcard (`smartroom/sensor/+`)
 **Merepresentasikan Skenario 4 (Wildcard `+`).**
 
 <img width="1868" height="1034" alt="Screenshot 2026-06-10 182251" src="https://github.com/user-attachments/assets/089c3b65-4009-465c-80e3-d61959898bb4" />
 
 **Hasil Pengujian**
 
-Subscriber berhasil menerima data dari topik `smartroom/sensor/temperature` dan `smartroom/sensor/humidity` secara bergantian. Data pada topik `smartroom/control/lamp` tidak diteruskan karena berada pada cabang hierarki yang berbeda, sehingga membuktikan bahwa wildcard `+` hanya mencocokkan **satu tingkat hierarki**.
+Subscriber berhasil menerima data dari topik `smartroom/sensor/temperature` dan `smartroom/sensor/humidity` secara bergantian. Data pada topik `smartroom/control/lamp` tidak diteruskan karena berada pada cabang hierarki yang berbeda, sehingga membuktikan bahwa wildcard `+` hanya mencocokkan **satu tingkat hierarki** setelah node `smartroom/sensor`.
 
 ---
 
-### 3️⃣ Pengujian Multi-Level Wildcard (`smartroom/#`)
+### 4️⃣ Pengujian Multi-Level Wildcard (`smartroom/#`)
 **Merepresentasikan Skenario 5 (Wildcard `#`).**
 
 <img width="1869" height="1037" alt="Screenshot 2026-06-10 182129" src="https://github.com/user-attachments/assets/7ada4018-942d-4fe9-8013-0ddc9cbc9216" />
 
 **Hasil Pengujian**
 
-Subscriber berhasil menerima seluruh data Smart Room yang berada di bawah prefiks `smartroom`, meliputi data suhu (**QoS 0**), kelembapan (**QoS 1**), dan kontrol lampu (**QoS 2**) secara simultan beserta payload JSON dan *timestamp* presisi milidetik. Hasil ini membuktikan bahwa wildcard `#` mampu menangkap seluruh topik pada semua tingkat hierarki.
+Subscriber berhasil menerima seluruh data Smart Room yang berada di bawah prefiks `smartroom`, meliputi data suhu (**QoS 0**), kelembapan (**QoS 1**), dan kontrol lampu (**QoS 2**) secara simultan beserta payload JSON dan *timestamp* presisi milidetik. Hasil ini membuktikan bahwa wildcard `#` mampu menangkap seluruh topik pada semua tingkat hierarki sehingga sesuai untuk proses monitoring sistem secara menyeluruh.
 
 ---
 
@@ -255,15 +270,20 @@ Seluruh fitur utama sistem berhasil diimplementasikan dan diuji, meliputi:
 - ✅ Interactive Subscriber Menu
 - ✅ Smart Room Monitoring & Control Simulation
 
-
 ## 📂 Struktur Repositori
-Berikut adalah susunan struktur file proyek tugas yang rapi dan terorganisir di dalam direktori repositori:
+
+Struktur direktori proyek disusun secara sederhana untuk memisahkan komponen Publisher, Subscriber, dan dokumentasi proyek.
+
 ```text
 CPS-MQTT-SmartRoom/
 │
-├── publisher.py       # Simulator Lingkungan Fisik & Pengirim Data JSON (Streaming Mode)
-├── subscriber.py      # Dashboard Pemantau Siber Berbasis Antarmuka Menu Interaktif
-├── README.md          # Dokumentasi Teknis Utama Proyek Platform (Markdown Masterpiece)
-└── Laporan_Praktikum_CPS_MQTT.pdf  # Dokumen Resmi Pelaporan Akademik Praktikum
+├── publisher.py      # Smart Room Publisher & Physical Environment Simulator
+├── subscriber.py     # Interactive MQTT Subscriber & Monitoring Console
+└── README.md         # Project Documentation
 ```
+---
+
+## 📌 Kesimpulan
+
+Implementasi Smart Room Monitoring & Control Platform berhasil merealisasikan komunikasi berbasis MQTT menggunakan pola Publish–Subscribe dengan dukungan variasi Quality of Service (QoS), hierarki topik terstruktur, serta mekanisme wildcard subscription. Seluruh skenario praktikum berhasil divalidasi sehingga sistem mampu merepresentasikan konsep dasar Cyber-Physical System secara interaktif, real-time, dan modular.
 
