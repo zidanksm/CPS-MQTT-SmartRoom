@@ -24,15 +24,6 @@ Proyek ini mengintegrasikan representasi data fisik lingkungan nyata ke dalam ru
 7. [Matriks Skenario & Analisis Pengujian](#-matriks-skenario--analisis-pengujian)
 8. [Struktur Repositori](#-struktur-repositori)
 
-1. [Deskripsi Proyek](#deskripsi-proyek)
-2. [Arsitektur Siber-Fisik (CPS Closed-Loop)](#arsitektur-siber-fisik-cps-closed-loop)
-3. [Manajemen Topik & Matriks QoS](#manajemen-topik--matriks-qos)
-4. [Prasyarat Sistem](#prasyarat-sistem)
-5. [Panduan Instalasi & Pengaturan](#panduan-instalasi--pengaturan)
-6. [Cara Menjalankan Simulasi](#cara-menjalankan-simulasi)
-7. [Matriks Skenario & Analisis Pengujian](#matriks-skenario--analisis-pengujian)
-8. [Struktur Repositori](#struktur-repositori)
-
 ---
 
 ## 📝 Deskripsi Proyek
@@ -61,6 +52,17 @@ Sistem komunikasi ini merepresentasikan siklus umpan balik (*closed-loop system*
   - Cyber Network: Mosquitto Broker mengelola tabel routing data siber dan menjaga keandalan paket berdasarkan tingkat QoS.
 
   - Cyber Controller: subscriber.py menangkap, melakukan parsing JSON, dan menganalisis aliran data masuk untuk kebutuhan monitoring ataupun keputusan aktuasi sakelar.
+
+---
+
+## Spesifikasi Kontrak Data (JSON Schema Payload)
+Data dikirim dalam representasi objek terstruktur JavaScript Object Notation (JSON) demi interoperabilitas sistem:
+
+Sensor Suhu: {"sensor": "suhu", "value": 25.68, "unit": "C"}
+
+Sensor Kelembapan: {"sensor": "kelembapan", "value": 61.43, "unit": "%"}
+
+Aktuator Lampu: {"device": "lampu_utama", "command": "ON"}
 
 ---
 
