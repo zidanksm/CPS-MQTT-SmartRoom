@@ -144,11 +144,12 @@ Analisis Teknis: Pada kondisi pengujian ini, Subscriber memilih opsi menu 3 (sma
 
 ## 📂 Struktur Repositori
 Berikut adalah susunan struktur file proyek tugas yang rapi dan terorganisir di dalam direktori repositori:
+```text
 CPS-MQTT-SmartRoom/
 │
 ├── publisher.py       # Simulator Lingkungan Fisik & Pengirim Data JSON (Streaming Mode)
 ├── subscriber.py      # Dashboard Pemantau Siber Berbasis Antarmuka Menu Interaktif
 ├── README.md          # Dokumentasi Teknis Utama Proyek Platform (Markdown Masterpiece)
 └── Laporan_Praktikum_CPS_MQTT.pdf  # Dokumen Resmi Pelaporan Akademik Praktikum
-
+```
 
