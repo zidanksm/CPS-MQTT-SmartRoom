@@ -78,20 +78,24 @@ Sebelum mengeksekusi program, pastikan lingkungan lokal Anda memenuhi spesifikas
 
 1. Kloning Repositori
 Buka Terminal/CMD Anda, arahkan ke direktori lokal, lalu jalankan perintah:
+```bash
 git clone [https://github.com/username-kamu/CPS-MQTT-SmartRoom.git](https://github.com/username-kamu/CPS-MQTT-SmartRoom.git)
 cd CPS-MQTT-SmartRoom
-
+```
 2. Instalasi Dependensi Jaringan Siber
+```bash
 Instal library MQTT client resmi untuk Python melalui pip:
-
+```
+```bash
 pip install paho-mqtt
+```
 
 3. Konfigurasi & Menjalankan Mosquitto Broker
 Pastikan layanan (service) Mosquitto Broker telah aktif berjalan di komputer lokal Anda pada port 1883. Untuk mematikan atau menyalakannya kembali di Windows, gunakan perintah administrator berikut:
-
+```bash
 # Menyalakan Mosquitto Service
 net start mosquitto
-
+```
 ---
 
 ## 🚀 Cara Menjalankan Simulasi
