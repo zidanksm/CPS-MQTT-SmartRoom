@@ -185,16 +185,19 @@ Langkah Eksekusi:
   Publisher akan langsung otomatis berada dalam Streaming Mode dan memancarkan seluruh topik data.
 
 ---
-## 📸 Matriks Skenario & Analisis Pengujian
-📑 Ringkasan Pemenuhan Skenario Tugas Praktikum:
+## 📸 Matriks Skenario Pengujian
 
-    | **Skenario Praktikum**                                              | **Implementasi pada Sistem**                                                                                                            | **Status**  |
-| ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ----------- |
-| **Skenario 1 – Komunikasi Dasar Publisher–Broker–Subscriber**       | Tervalidasi pada pengujian **Menu 1** melalui komunikasi pada topik `smartroom/sensor/temperature`.                                     | ✅ Terpenuhi |
-| **Skenario 2 – Pengujian Quality of Service (QoS 0, QoS 1, QoS 2)** | Diamati melalui proses *Streaming Mode* Publisher yang mengirim seluruh topik menggunakan QoS berbeda pada setiap siklus pengiriman.    | ✅ Terpenuhi |
-| **Skenario 3 – Subscription Topik Spesifik**                        | Tervalidasi pada pengujian **Menu 1**, di mana Subscriber hanya menerima data dari topik `smartroom/sensor/temperature`.                | ✅ Terpenuhi |
-| **Skenario 4 – Penggunaan Single-Level Wildcard (`+`)**             | Tervalidasi pada pengujian **Menu 2** dengan *subscription* `smartroom/sensor/+` sehingga Subscriber menerima data suhu dan kelembapan. | ✅ Terpenuhi |
-| **Skenario 5 – Penggunaan Multi-Level Wildcard (`#`)**              | Tervalidasi pada pengujian **Menu 3** dengan *subscription* `smartroom/#` sehingga seluruh data Smart Room diterima secara bersamaan.   | ✅ Terpenuhi |
+Pengujian sistem mengacu pada lima skenario yang ditetapkan pada modul praktikum MQTT. Implementasi yang dikembangkan menggunakan **satu program Publisher** yang mempublikasikan seluruh data Smart Room secara kontinu dengan variasi **QoS 0, QoS 1, dan QoS 2**, serta **satu program Subscriber** yang menyediakan tiga mode *subscription* (topik spesifik, wildcard `+`, dan wildcard `#`). Dengan rancangan tersebut, beberapa skenario praktikum dapat divalidasi dalam satu proses pengujian sehingga seluruh kebutuhan praktikum tetap terpenuhi melalui **tiga kali pengujian**.
+
+| Skenario Praktikum | Implementasi pada Sistem | Status |
+| :--- | :--- | :---: |
+| **Skenario 1**<br>Komunikasi Dasar Publisher–Broker–Subscriber | Tervalidasi melalui **Menu 1**, di mana Publisher mengirim data dan Subscriber menerima data pada topik `smartroom/sensor/temperature`. | ✅ |
+| **Skenario 2**<br>Pengujian Quality of Service (QoS 0, 1, dan 2) | Diamati selama proses **Streaming Mode** Publisher yang mengirim seluruh topik menggunakan QoS berbeda pada setiap siklus pengiriman. | ✅ |
+| **Skenario 3**<br>Subscription Topik Spesifik | Tervalidasi melalui **Menu 1**, sehingga Subscriber hanya menerima data dari topik `smartroom/sensor/temperature`. | ✅ |
+| **Skenario 4**<br>Penggunaan Wildcard `+` | Tervalidasi melalui **Menu 2** dengan *subscription* `smartroom/sensor/+` sehingga Subscriber menerima data suhu dan kelembapan secara bersamaan. | ✅ |
+| **Skenario 5**<br>Penggunaan Wildcard `#` | Tervalidasi melalui **Menu 3** dengan *subscription* `smartroom/#` sehingga seluruh data Smart Room diterima secara simultan. | ✅ |
+
+> **Catatan:** Implementasi sistem hanya memerlukan **tiga kali eksekusi pengujian** karena Publisher melakukan *streaming* seluruh topik secara simultan dengan variasi QoS 0, QoS 1, dan QoS 2, sedangkan Subscriber menyediakan tiga mode *subscription* (topik spesifik, wildcard `+`, dan wildcard `#`). Dengan demikian, seluruh skenario praktikum dapat tervalidasi tanpa memerlukan lima proses pengujian yang terpisah.
 
 ---
 ## 🖼️ Bukti Visual Dokumentasi Hasil Running
