@@ -7,6 +7,14 @@ Repositori ini berisi implementasi platform Smart Room Monitoring & Control berb
 
 ---
 
+## 📌 Badges & Technologies
+![Python Version](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![MQTT Protocol](https://img.shields.io/badge/MQTT-v5.0%20%2F%20v3.1.1-660066?style=for-the-badge&logo=mqtt&logoColor=white)
+![Broker](https://img.shields.io/badge/Eclipse_Mosquitto-v2.x-3C5280?style=for-the-badge&logo=eclipse-mosquitto&logoColor=white)
+![Platform](https://img.shields.io/badge/Windows-x64-0078D4?style=for-the-badge&logo=windows&logoColor=white)
+
+---
+
 ## 💻 Prasyarat Sistem
 Sebelum mengeksekusi program, pastikan lingkungan lokal Anda memenuhi spesifikasi berikut:
 
@@ -121,13 +129,7 @@ Selama simulasi berlangsung, data akan diteruskan oleh Mosquitto Broker sesuai m
 
 ---
 
-## 📌 Badges & Technologies
-![Python Version](https://img.shields.io/badge/Python-3.11%2B-3776AB?style=for-the-badge&logo=python&logoColor=white)
-![MQTT Protocol](https://img.shields.io/badge/MQTT-v5.0%20%2F%20v3.1.1-660066?style=for-the-badge&logo=mqtt&logoColor=white)
-![Broker](https://img.shields.io/badge/Eclipse_Mosquitto-v2.x-3C5280?style=for-the-badge&logo=eclipse-mosquitto&logoColor=white)
-![Platform](https://img.shields.io/badge/Windows-x64-0078D4?style=for-the-badge&logo=windows&logoColor=white)
 
----
 
 ## 📖 Daftar Isi (Table of Contents)
 
