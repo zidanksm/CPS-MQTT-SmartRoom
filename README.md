@@ -1,28 +1,25 @@
 # 🏢 Smart Room Monitoring & Control via MQTT
 
-Implementasi sistem **Smart Room Monitoring & Control** menggunakan protokol **MQTT** dengan **Eclipse Mosquitto Broker** dan **Python**.
+Implementasi sistem **Smart Room Monitoring & Control** menggunakan protokol **MQTT**, bahasa pemrograman **Python**, dan **Eclipse Mosquitto Broker**.
 
-Sistem terdiri dari dua komponen utama:
+Sistem mensimulasikan komunikasi antara sensor dan perangkat dalam sebuah ruangan pintar menggunakan arsitektur **Publish–Subscribe**, dengan dukungan:
 
-- **Publisher** → Mengirim data sensor dan kontrol perangkat.
-- **Subscriber** → Menerima dan menampilkan data berdasarkan topik yang dipilih.
-
-Fitur yang diimplementasikan:
-
-- Publish–Subscribe MQTT
-- Quality of Service (QoS 0, QoS 1, QoS 2)
-- Topic Filtering
-- Single-Level Wildcard (`+`)
-- Multi-Level Wildcard (`#`)
-- Real-Time Monitoring
+- 🌡️ Monitoring suhu ruangan
+- 💧 Monitoring kelembapan ruangan
+- 💡 Kontrol status lampu
+- 📡 MQTT Topic Filtering
+- 🔄 MQTT Wildcard Subscription (`+` dan `#`)
+- ⚙️ Quality of Service (QoS 0, QoS 1, QoS 2)
 
 ---
 
 ## 📋 Prasyarat
 
+Pastikan perangkat telah memenuhi kebutuhan berikut.
+
 ### Python
 
-Pastikan Python **3.10 atau lebih baru** telah terinstal.
+Minimal Python 3.10
 
 ```bash
 python --version
@@ -38,15 +35,31 @@ pip install paho-mqtt
 
 ### Eclipse Mosquitto Broker
 
-Install Mosquitto Broker:
+Install Mosquitto sesuai sistem operasi:
 
-| Sistem Operasi | Perintah |
+| Sistem Operasi | Instalasi |
 |---|---|
 | Ubuntu/Debian | `sudo apt install mosquitto mosquitto-clients` |
 | macOS | `brew install mosquitto` |
-| Windows | Download dari https://mosquitto.org/download/ |
+| Windows | https://mosquitto.org/download/ |
 
-Menjalankan broker:
+---
+
+## 🚀 Menjalankan Program
+
+### Langkah 1 — Jalankan Mosquitto Broker
+
+#### Linux/macOS
+
+```bash
+mosquitto -v
+```
+
+atau
+
+```bash
+sudo systemctl start mosquitto
+```
 
 #### Windows
 
@@ -54,13 +67,7 @@ Menjalankan broker:
 net start mosquitto
 ```
 
-#### Linux
-
-```bash
-sudo systemctl start mosquitto
-```
-
-Broker berjalan pada:
+Broker akan berjalan pada:
 
 ```text
 localhost:1883
@@ -68,11 +75,25 @@ localhost:1883
 
 ---
 
-## 🚀 Cara Menjalankan Program
+## 💡 Rekomendasi Pengujian
 
-> Jalankan **Subscriber terlebih dahulu**, kemudian jalankan **Publisher**.
+Disarankan menggunakan **Visual Studio Code Split Terminal** atau dua terminal terpisah.
 
-### Langkah 1 — Jalankan Subscriber
+Dengan cara ini aktivitas Publisher dan Subscriber dapat diamati secara bersamaan secara real-time.
+
+```text
+┌─────────────────────┬─────────────────────┐
+│     Subscriber      │      Publisher      │
+├─────────────────────┼─────────────────────┤
+│ Data diterima       │ Data dikirim        │
+│ Topic filtering     │ JSON publishing     │
+│ Wildcard matching   │ QoS monitoring      │
+└─────────────────────┴─────────────────────┘
+```
+
+---
+
+## ▶️ Langkah 2 — Jalankan Subscriber
 
 Buka terminal pertama:
 
@@ -83,16 +104,27 @@ python subscriber.py
 Program akan menampilkan menu:
 
 ```text
-1. smartroom/sensor/temperature
-2. smartroom/sensor/+
-3. smartroom/#
+=========================================================
+ CPS SUBSCRIBER - INTERACTIVE WILDCARD TESTING
+=========================================================
+
+[1] Topik Spesifik
+    smartroom/sensor/temperature
+
+[2] Wildcard (+)
+    smartroom/sensor/+
+
+[3] Wildcard (#)
+    smartroom/#
+
+Masukkan pilihan Anda:
 ```
 
 Pilih salah satu mode subscription.
 
 ---
 
-### Langkah 2 — Jalankan Publisher
+## ▶️ Langkah 3 — Jalankan Publisher
 
 Buka terminal kedua:
 
@@ -100,65 +132,127 @@ Buka terminal kedua:
 python publisher.py
 ```
 
-Publisher akan mengirim data Smart Room secara periodik.
+Publisher akan mulai mengirim data secara periodik.
 
-Topik yang digunakan:
+Contoh output:
+
+```text
+[QoS 0] Sent:
+smartroom/sensor/temperature
+
+[QoS 1] Sent:
+smartroom/sensor/humidity
+
+[QoS 2] Sent:
+smartroom/control/lamp
+```
+
+---
+
+## 📡 Topik MQTT yang Digunakan
 
 | Topik | Data | QoS |
 |---|---|---|
-| `smartroom/sensor/temperature` | Data suhu | 0 |
-| `smartroom/sensor/humidity` | Data kelembapan | 1 |
-| `smartroom/control/lamp` | Status lampu | 2 |
+| `smartroom/sensor/temperature` | Suhu Ruangan | 0 |
+| `smartroom/sensor/humidity` | Kelembapan Ruangan | 1 |
+| `smartroom/control/lamp` | Status Lampu | 2 |
 
 ---
 
-### Langkah 3 — Menghentikan Program
+## 🎯 Mode Subscription
 
-Tekan:
+### Mode 1 — Topik Spesifik
 
-```bash
-CTRL + C
+Subscription:
+
+```text
+smartroom/sensor/temperature
 ```
 
-pada terminal Publisher maupun Subscriber.
+Menerima:
+
+```text
+✔ Data suhu
+```
 
 ---
 
-## 🎯 Penjelasan Mode Subscription
+### Mode 2 — Wildcard Single-Level
 
-| Pilihan | Subscription | Keterangan |
-|---|---|---|
-| `1` | `smartroom/sensor/temperature` | Hanya menerima data suhu |
-| `2` | `smartroom/sensor/+` | Menerima data suhu dan kelembapan |
-| `3` | `smartroom/#` | Menerima seluruh data Smart Room |
+Subscription:
+
+```text
+smartroom/sensor/+
+```
+
+Menerima:
+
+```text
+✔ smartroom/sensor/temperature
+✔ smartroom/sensor/humidity
+```
+
+Tidak menerima:
+
+```text
+✘ smartroom/control/lamp
+```
 
 ---
 
-## 🧪 Pemetaan Skenario Praktikum
+### Mode 3 — Wildcard Multi-Level
+
+Subscription:
+
+```text
+smartroom/#
+```
+
+Menerima:
+
+```text
+✔ smartroom/sensor/temperature
+✔ smartroom/sensor/humidity
+✔ smartroom/control/lamp
+```
+
+---
+
+## 🧪 Keterkaitan dengan Skenario Praktikum
 
 | Skenario | Implementasi |
 |---|---|
-| Komunikasi Dasar Publisher–Subscriber | Menu 1 |
+| Komunikasi Dasar Publisher–Subscriber | Mode 1 |
 | QoS 0, QoS 1, QoS 2 | Publisher |
-| Subscription Topik Spesifik | Menu 1 |
-| Wildcard `+` | Menu 2 |
-| Wildcard `#` | Menu 3 |
+| Topik Spesifik | Mode 1 |
+| Wildcard `+` | Mode 2 |
+| Wildcard `#` | Mode 3 |
 
 ---
 
-## 📸 Hasil Pengujian
+## 🔄 Alur Eksekusi Program
 
-### Topik Spesifik
-
-*(Tambahkan screenshot pengujian topik spesifik di sini)*
-
-### Wildcard `+`
-
-*(Tambahkan screenshot pengujian wildcard + di sini)*
-
-### Wildcard `#`
-
-*(Tambahkan screenshot pengujian wildcard # di sini)*
+```text
+Start Mosquitto Broker
+          │
+          ▼
+Run subscriber.py
+          │
+          ▼
+Pilih Mode 1 / 2 / 3
+          │
+          ▼
+Run publisher.py
+          │
+          ▼
+Publisher Mengirim Data
+          │
+          ▼
+Mosquitto Broker
+          │
+          ▼
+Subscriber Menampilkan Data
+```
 
 ---
 
@@ -175,9 +269,9 @@ pada terminal Publisher maupun Subscriber.
 
 ## ❗ Troubleshooting
 
-### Gagal terhubung ke broker
+### Tidak dapat terhubung ke broker
 
-Pastikan Mosquitto Broker sudah berjalan:
+Pastikan Mosquitto sudah berjalan:
 
 ```bash
 net start mosquitto
@@ -189,7 +283,9 @@ atau
 sudo systemctl start mosquitto
 ```
 
-### Modul `paho-mqtt` tidak ditemukan
+---
+
+### Modul paho-mqtt tidak ditemukan
 
 Install ulang:
 
@@ -197,11 +293,25 @@ Install ulang:
 pip install paho-mqtt
 ```
 
+---
+
 ### Subscriber tidak menerima pesan
 
-- Pastikan Broker aktif.
-- Jalankan Subscriber sebelum Publisher.
-- Pastikan topik subscription sesuai.
+Periksa hal berikut:
+
+- Broker aktif
+- Subscriber dijalankan terlebih dahulu
+- Topik subscription sesuai
+- Port MQTT menggunakan `1883`
 
 ---
 
+## ✅ Hasil yang Diharapkan
+
+Jika seluruh langkah berhasil dilakukan:
+
+- Publisher dapat mengirim data secara periodik.
+- Subscriber menerima data sesuai topik yang dipilih.
+- QoS 0, QoS 1, dan QoS 2 dapat diamati pada proses pengiriman.
+- Wildcard `+` dan `#` bekerja sesuai spesifikasi MQTT.
+- Seluruh skenario praktikum berhasil dijalankan.
