@@ -126,13 +126,13 @@ Langkah Eksekusi:
 ## 📸 Matriks Skenario & Analisis Pengujian
 📑 Ringkasan Pemenuhan Skenario Tugas Praktikum:
 
-  Skenario 1: Komunikasi dasar penukaran data dari publisher ke subscriber secara linear (Terpenuhi).
+    Skenario 1: Komunikasi dasar penukaran data dari publisher ke subscriber secara linear (Terpenuhi).
 
-  Skenario 2 & 3: Pengiriman pesan multi-topik dengan variasi QoS 0, 1, dan 2 secara paralel (Terpenuhi otomatis via Opsi 2 Publisher).
+    Skenario 2 & 3: Pengiriman pesan multi-topik dengan variasi QoS 0, 1, dan 2 secara paralel (Terpenuhi otomatis via Opsi 2 Publisher).
 
-  Skenario 4: Penggunaan Single-Level Wildcard + untuk menyaring tingkat hierarki tertentu (Terpenuhi melalui Opsi Menu 2 pada Subscriber).
+    Skenario 4: Penggunaan Single-Level Wildcard + untuk menyaring tingkat hierarki tertentu (Terpenuhi melalui Opsi Menu 2 pada Subscriber).
 
-  Skenario 5: Penggunaan Multi-Level Wildcard # untuk menangkap seluruh data node secara masif (Terpenuhi melalui Opsi Menu 3 pada Subscriber).
+    Skenario 5: Penggunaan Multi-Level Wildcard # untuk menangkap seluruh data node secara masif (Terpenuhi melalui Opsi Menu 3 pada Subscriber).
 
 ---
 ## 🖼️ Bukti Visual Dokumentasi Hasil Running
