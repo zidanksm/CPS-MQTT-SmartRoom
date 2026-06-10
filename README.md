@@ -42,12 +42,6 @@ Implementasi ini mengadopsi beberapa karakteristik utama Cyber-Physical System y
 Sistem komunikasi ini merepresentasikan siklus umpan balik (*closed-loop system*) yang terintegrasi:
 
 ```text
-[ PHYSICAL PLANT ] ──(Sensing via JSON)──> [ MQTT BROKER ] ──(Routing)──> [ CYBER CONTROLLER ]
-  (Kamar Pintar)                             (Mosquitto)                   (Interactive Sub)
-        ▲                                                                          │
-        └─────────────────(Actuation / QoS 2 Command)──────────────────────────────┘
-```
-```text
 +----------------------+
 | Physical Plant       |
 |----------------------|
@@ -84,11 +78,34 @@ Sistem komunikasi ini merepresentasikan siklus umpan balik (*closed-loop system*
 ## Spesifikasi Kontrak Data (JSON Schema Payload)
 Data dikirim dalam representasi objek terstruktur JavaScript Object Notation (JSON) demi interoperabilitas sistem:
 
-Sensor Suhu: {"sensor": "suhu", "value": 25.68, "unit": "C"}
+### Sensor Suhu
 
-Sensor Kelembapan: {"sensor": "kelembapan", "value": 61.43, "unit": "%"}
+```json
+{
+  "sensor": "suhu",
+  "value": 25.68,
+  "unit": "C"
+}
+```
 
-Aktuator Lampu: {"device": "lampu_utama", "command": "ON"}
+### Sensor Kelembapan
+
+```json
+{
+  "sensor": "kelembapan",
+  "value": 61.43,
+  "unit": "%"
+}
+```
+
+### Aktuator Lampu
+
+```json
+{
+  "device": "lampu_utama",
+  "command": "ON"
+}
+```
 
 ---
 
@@ -126,11 +143,8 @@ git clone [https://github.com/username-kamu/CPS-MQTT-SmartRoom.git](https://gith
 cd CPS-MQTT-SmartRoom
 ```
 2. Instalasi Dependensi Jaringan Siber
-### Install dependency
+### Install Python Dependency
 
-```bash
-Instal library MQTT client resmi untuk Python melalui pip:
-```
 ```bash
 pip install paho-mqtt
 ```
@@ -151,22 +165,23 @@ netstat -ano | findstr 1883
 Sistem ini diuji paling optimal menggunakan fitur terminal terintegrasi pada Visual Studio Code dengan memanfaatkan mekanisme Split Terminal demi menampilkan visualisasi data secara berdampingan.
 
 ```text
-Subscriber
-↓
-
-Waiting...
-
-↓
-
-Publisher Start
-
-↓
-
-Broker Route
-
-↓
-
-Subscriber Receive
++------------------+
+| subscriber.py    |
+| (Listening Mode) |
++--------+---------+
+         |
+         |
+         v
++------------------+
+| Mosquitto Broker |
++--------+---------+
+         ^
+         |
+         |
++--------+---------+
+| publisher.py     |
+| (Streaming Mode) |
++------------------+
 ```
 
 Langkah Eksekusi:
