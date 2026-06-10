@@ -382,21 +382,25 @@ Seluruh skenario praktikum berhasil divalidasi melalui tiga proses pengujian yan
 
 ## 🖼️ Hasil Pengujian Sistem
 
-Implementasi sistem berhasil memvalidasi seluruh skenario praktikum MQTT melalui **tiga kali proses pengujian**. Hal ini dimungkinkan karena **Publisher** secara kontinu mempublikasikan seluruh topik Smart Room menggunakan variasi **QoS 0**, **QoS 1**, dan **QoS 2**, sedangkan **Subscriber** menyediakan tiga mode *subscription* yang mampu merepresentasikan seluruh skenario pengujian pada modul praktikum.
+Implementasi sistem berhasil memvalidasi seluruh skenario praktikum MQTT melalui **tiga kali proses pengujian**. Hal ini dimungkinkan karena **Publisher** secara kontinu mempublikasikan seluruh data Smart Room menggunakan variasi **QoS 0**, **QoS 1**, dan **QoS 2**, sedangkan **Subscriber** menyediakan tiga mode *subscription* berupa **topik spesifik**, **single-level wildcard (`+`)**, dan **multi-level wildcard (`#`)**. Dengan rancangan tersebut, seluruh skenario praktikum dapat direpresentasikan tanpa memerlukan lima proses pengujian yang terpisah.
 
 ---
 
 ### 1️⃣ Pengujian Topik Spesifik (`smartroom/sensor/temperature`)
 
-**Merepresentasikan Skenario 1 (Komunikasi Dasar) dan Skenario 3 (Subscription Topik Spesifik).**
+**Merepresentasikan Skenario 1 (Komunikasi Dasar Publisher–Broker–Subscriber) dan Skenario 3 (Subscription Topik Spesifik).**
 
 <img width="1867" height="1032" alt="Screenshot 2026-06-10 182438" src="https://github.com/user-attachments/assets/3c4c21a5-a695-4dd7-b7d5-01fffd8ca615" />
 
 #### Hasil Pengujian
 
-Subscriber hanya menerima data pada topik `smartroom/sensor/temperature` meskipun Publisher secara simultan mempublikasikan data suhu, kelembapan, dan status lampu. Hal ini menunjukkan bahwa **Mosquitto Broker** berhasil menerapkan mekanisme **topic filtering** sehingga hanya paket yang sesuai dengan topik *subscription* yang diteruskan kepada Subscriber.
+Subscriber hanya menerima data pada topik `smartroom/sensor/temperature` meskipun Publisher secara bersamaan mempublikasikan data suhu, kelembapan, dan status lampu. Mosquitto Broker berhasil melakukan proses **topic filtering** sehingga hanya paket yang sesuai dengan topik *subscription* yang diteruskan kepada Subscriber.
 
-> **Kesimpulan:** Mekanisme komunikasi **Publish–Subscribe** dan **Subscription Topik Spesifik** berhasil diimplementasikan sesuai spesifikasi MQTT.
+#### Analisis
+
+Hasil tersebut menunjukkan bahwa mekanisme **Publish–Subscribe** MQTT berjalan dengan baik, di mana proses routing pesan sepenuhnya ditentukan oleh topik yang dilanggan tanpa dipengaruhi oleh topik lain yang dipublikasikan secara simultan.
+
+> **Kesimpulan:** Implementasi komunikasi dasar MQTT dan *subscription* topik spesifik berhasil direalisasikan sesuai mekanisme **Publish–Subscribe**.
 
 ---
 
@@ -404,15 +408,17 @@ Subscriber hanya menerima data pada topik `smartroom/sensor/temperature` meskipu
 
 **Merepresentasikan Skenario 2 (Quality of Service MQTT).**
 
-<img width="1867" height="1032" alt="Screenshot 2026-06-10 182438" src="https://github.com/user-attachments/assets/3c4c21a5-a695-4dd7-b7d5-01fffd8ca615" />
-
 #### Hasil Pengujian
 
-Selama proses **Continuous Streaming Mode**, Publisher mempublikasikan data suhu menggunakan **QoS 0**, data kelembapan menggunakan **QoS 1**, dan data kontrol lampu menggunakan **QoS 2**. Informasi tingkat QoS ditampilkan secara langsung pada log Publisher melalui label `[QoS 0]`, `[QoS 1]`, dan `[QoS 2]`, sehingga implementasi setiap mekanisme pengiriman dapat diamati secara jelas.
+Selama proses **Continuous Streaming Mode**, Publisher mempublikasikan data suhu menggunakan **QoS 0**, data kelembapan menggunakan **QoS 1**, dan data kontrol lampu menggunakan **QoS 2**. Setiap proses pengiriman menampilkan informasi tingkat QoS pada log Publisher sehingga implementasi masing-masing mekanisme dapat diamati secara langsung.
 
-> **Catatan:** Pengujian **Quality of Service (QoS)** diamati melalui log Publisher yang muncul selama seluruh proses pengujian sehingga tidak memerlukan eksekusi maupun dokumentasi visual yang terpisah. Screenshot yang digunakan merupakan proses eksekusi yang sama dengan pengujian komunikasi dasar karena variasi **QoS 0**, **QoS 1**, dan **QoS 2** dipublikasikan secara simultan pada setiap siklus **Streaming Mode**.
+#### Analisis
 
-> **Kesimpulan:** Implementasi **QoS 0 (At Most Once)**, **QoS 1 (At Least Once)**, dan **QoS 2 (Exactly Once)** berhasil dijalankan sesuai karakteristik masing-masing tingkat keandalan MQTT.
+Implementasi **QoS 0 (At Most Once)** digunakan untuk data yang dikirim secara periodik tanpa jaminan pengiriman, **QoS 1 (At Least Once)** memastikan pesan diterima minimal satu kali melalui mekanisme *acknowledgement*, sedangkan **QoS 2 (Exactly Once)** menjamin pesan dikirim tepat satu kali sehingga sesuai digunakan pada data kontrol aktuator.
+
+> **Catatan:** Pengujian QoS diamati melalui log Publisher selama proses *Streaming Mode* sehingga tidak memerlukan dokumentasi visual terpisah. Variasi **QoS 0**, **QoS 1**, dan **QoS 2** telah dipublikasikan secara simultan pada setiap siklus pengiriman.
+
+> **Kesimpulan:** Implementasi **Quality of Service (QoS 0, QoS 1, dan QoS 2)** berhasil direalisasikan sesuai karakteristik tingkat keandalan pada protokol MQTT.
 
 ---
 
@@ -424,9 +430,13 @@ Selama proses **Continuous Streaming Mode**, Publisher mempublikasikan data suhu
 
 #### Hasil Pengujian
 
-Subscriber berhasil menerima data dari topik `smartroom/sensor/temperature` dan `smartroom/sensor/humidity` secara bergantian, sedangkan data pada topik `smartroom/control/lamp` tidak diteruskan karena berada pada cabang hierarki yang berbeda. Hasil ini membuktikan bahwa wildcard `+` hanya mencocokkan **satu tingkat hierarki** setelah node `smartroom/sensor`.
+Subscriber berhasil menerima data dari topik `smartroom/sensor/temperature` dan `smartroom/sensor/humidity` secara bergantian, sedangkan data pada topik `smartroom/control/lamp` tidak diteruskan karena berada pada cabang hierarki yang berbeda.
 
-> **Kesimpulan:** Mekanisme **Single-Level Wildcard (`+`)** berhasil melakukan penyaringan topik berdasarkan satu tingkat hierarki sesuai standar MQTT.
+#### Analisis
+
+Karakter wildcard `+` hanya mencocokkan **satu tingkat hierarki** setelah node `smartroom/sensor`, sehingga hanya topik yang berada pada level tersebut yang diteruskan oleh Broker kepada Subscriber.
+
+> **Kesimpulan:** Mekanisme **Single-Level Wildcard (`+`)** berhasil melakukan penyaringan topik berdasarkan satu tingkat hierarki sesuai spesifikasi MQTT.
 
 ---
 
@@ -438,8 +448,12 @@ Subscriber berhasil menerima data dari topik `smartroom/sensor/temperature` dan 
 
 #### Hasil Pengujian
 
-Subscriber berhasil menerima seluruh data Smart Room yang berada di bawah prefiks `smartroom`, meliputi data suhu (**QoS 0**), kelembapan (**QoS 1**), dan kontrol lampu (**QoS 2**) secara simultan beserta **JSON Payload** dan **timestamp presisi milidetik**. Hal ini menunjukkan bahwa wildcard `#` mampu mencocokkan seluruh topik pada semua tingkat hierarki tanpa batasan kedalaman.
+Subscriber berhasil menerima seluruh data Smart Room yang berada di bawah prefiks `smartroom`, meliputi data suhu (**QoS 0**), kelembapan (**QoS 1**), dan kontrol lampu (**QoS 2**) secara simultan beserta **JSON Payload** dan **timestamp** presisi milidetik.
 
-> **Kesimpulan:** Mekanisme **Multi-Level Wildcard (`#`)** berhasil menangkap seluruh topik pada namespace `smartroom`, sehingga sesuai untuk kebutuhan monitoring sistem secara menyeluruh.
+#### Analisis
+
+Wildcard `#` mampu mencocokkan seluruh topik tanpa batasan kedalaman hierarki sehingga seluruh aliran data yang dipublikasikan Publisher berhasil diterima oleh Subscriber. Mekanisme ini sangat sesuai digunakan untuk kebutuhan monitoring sistem secara menyeluruh.
+
+> **Kesimpulan:** Implementasi **Multi-Level Wildcard (`#`)** berhasil menangkap seluruh topik pada namespace `smartroom` sesuai mekanisme wildcard subscription pada protokol MQTT.
 
 ---
