@@ -200,26 +200,61 @@ Pengujian sistem mengacu pada lima skenario yang ditetapkan pada modul praktikum
 > **Catatan:** Implementasi sistem hanya memerlukan **tiga kali eksekusi pengujian** karena Publisher melakukan *streaming* seluruh topik secara simultan dengan variasi QoS 0, QoS 1, dan QoS 2, sedangkan Subscriber menyediakan tiga mode *subscription* (topik spesifik, wildcard `+`, dan wildcard `#`). Dengan demikian, seluruh skenario praktikum dapat tervalidasi tanpa memerlukan lima proses pengujian yang terpisah.
 
 ---
-## 🖼️ Bukti Visual Dokumentasi Hasil Running
-  1. Skenario 1 & 3: Pengujian Target Topik Spesifik (Hanya Jalur Sensor Suhu)
-    
-     <img width="1867" height="1032" alt="Screenshot 2026-06-10 182438" src="https://github.com/user-attachments/assets/3c4c21a5-a695-4dd7-b7d5-01fffd8ca615" />
+---
 
-  Analisis Teknis: Pada kondisi pengujian ini, komponen Subscriber memilih opsi menu 1 (smartroom/sensor/temperature). Meskipun Publisher memancarkan data sensor  kelembapan dan perintah kontrol lampu secara masif (seperti yang terlihat pada log terminal kanan), broker secara cerdas menyaring data tersebut sehingga Subscriber hanya menerima pesan dari kluster temperatur dengan tingkat keandalan QoS 0.
+## 🖼️ Hasil Pengujian Sistem
 
-2. Skenario 4: Pengujian Penyaringan Kluster Sensor (Single-Level Wildcard +)
-  
-   <img width="1868" height="1034" alt="Screenshot 2026-06-10 182251" src="https://github.com/user-attachments/assets/089c3b65-4009-465c-80e3-d61959898bb4" />
+Implementasi sistem berhasil memvalidasi seluruh skenario praktikum MQTT melalui **tiga proses pengujian**, di mana beberapa skenario dapat direalisasikan dalam satu eksekusi karena Publisher melakukan *streaming* seluruh topik secara simultan dan Subscriber menyediakan beberapa mode *subscription*.
 
-    Analisis Teknis: Pada kondisi pengujian ini, Subscriber memilih opsi menu 2 (smartroom/sensor/+). Berdasarkan aturan arsitektur pola routing tree MQTT, karakter wildcard + mengisolasi pencarian hanya pada satu tingkat folder folder. Log terminal siber membuktikan bahwa data smartroom/sensor/temperature (QoS 0) dan smartroom/sensor/humidity (QoS 1) berhasil ditangkap secara bergantian, sementara data aktuasi lampu (smartroom/control/lamp) sepenuhnya disaring keluar dari sistem karena berada pada struktur cabang hierarki yang berbeda.
+### 1️⃣ Pengujian Topik Spesifik (`smartroom/sensor/temperature`)
+**Merepresentasikan Skenario 1 (Komunikasi Dasar) dan Skenario 3 (Subscription Topik Spesifik).**
 
-3. Skenario 5: Pengujian Menangkap Seluruh Data Ruangan (Multi-Level Wildcard #)
+<img width="1867" height="1032" alt="Screenshot 2026-06-10 182438" src="https://github.com/user-attachments/assets/3c4c21a5-a695-4dd7-b7d5-01fffd8ca615" />
 
-    <img width="1869" height="1037" alt="Screenshot 2026-06-10 182129" src="https://github.com/user-attachments/assets/7ada4018-942d-4fe9-8013-0ddc9cbc9216" /> 
+**Hasil Pengujian**
 
-    Analisis: Pada kondisi pengujian ini, Subscriber memilih opsi menu 3 (smartroom/#). Sesuai dengan spesifikasi pola routing MQTT, wildcard # bersifat multi-level yang mampu menangkap seluruh data tanpa batasan tingkatan hierarki folder di bawah node utama. Log terminal siber membuktikan bahwa seluruh aliran data, baik sensor suhu (QoS 0), kelembapan (QoS 1), hingga perintah kontrol lampu (QoS 2), berhasil diterima secara paralel, simultan, dan lengkap.
+Subscriber hanya menerima data pada topik `smartroom/sensor/temperature` meskipun Publisher secara simultan mengirimkan data suhu, kelembapan, dan status lampu. Hasil ini menunjukkan bahwa Mosquitto Broker berhasil melakukan *topic filtering* sesuai mekanisme **Publish-Subscribe** MQTT.
 
 ---
+
+### 2️⃣ Pengujian Single-Level Wildcard (`smartroom/sensor/+`)
+**Merepresentasikan Skenario 4 (Wildcard `+`).**
+
+<img width="1868" height="1034" alt="Screenshot 2026-06-10 182251" src="https://github.com/user-attachments/assets/089c3b65-4009-465c-80e3-d61959898bb4" />
+
+**Hasil Pengujian**
+
+Subscriber berhasil menerima data dari topik `smartroom/sensor/temperature` dan `smartroom/sensor/humidity` secara bergantian. Data pada topik `smartroom/control/lamp` tidak diteruskan karena berada pada cabang hierarki yang berbeda, sehingga membuktikan bahwa wildcard `+` hanya mencocokkan **satu tingkat hierarki**.
+
+---
+
+### 3️⃣ Pengujian Multi-Level Wildcard (`smartroom/#`)
+**Merepresentasikan Skenario 5 (Wildcard `#`).**
+
+<img width="1869" height="1037" alt="Screenshot 2026-06-10 182129" src="https://github.com/user-attachments/assets/7ada4018-942d-4fe9-8013-0ddc9cbc9216" />
+
+**Hasil Pengujian**
+
+Subscriber berhasil menerima seluruh data Smart Room yang berada di bawah prefiks `smartroom`, meliputi data suhu (**QoS 0**), kelembapan (**QoS 1**), dan kontrol lampu (**QoS 2**) secara simultan beserta payload JSON dan *timestamp* presisi milidetik. Hasil ini membuktikan bahwa wildcard `#` mampu menangkap seluruh topik pada semua tingkat hierarki.
+
+---
+
+## ✅ Hasil Implementasi
+
+Seluruh fitur utama sistem berhasil diimplementasikan dan diuji, meliputi:
+
+- ✅ Publish-Subscribe Communication
+- ✅ Multiple MQTT Topics
+- ✅ Quality of Service (QoS 0, QoS 1, QoS 2)
+- ✅ Topic Filtering
+- ✅ Single-Level Wildcard (`+`)
+- ✅ Multi-Level Wildcard (`#`)
+- ✅ JSON Payload Communication
+- ✅ Millisecond Timestamp Logging
+- ✅ Continuous Streaming Mode
+- ✅ Interactive Subscriber Menu
+- ✅ Smart Room Monitoring & Control Simulation
+
 
 ## 📂 Struktur Repositori
 Berikut adalah susunan struktur file proyek tugas yang rapi dan terorganisir di dalam direktori repositori:
