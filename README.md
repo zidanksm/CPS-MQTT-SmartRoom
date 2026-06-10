@@ -151,19 +151,19 @@ Langkah Eksekusi:
     
      <img width="1867" height="1032" alt="Screenshot 2026-06-10 182438" src="https://github.com/user-attachments/assets/3c4c21a5-a695-4dd7-b7d5-01fffd8ca615" />
 
-         Analisis Teknis: Pada kondisi pengujian ini, komponen Subscriber memilih opsi menu 1 (smartroom/sensor/temperature). Meskipun Publisher memancarkan data sensor  kelembapan dan perintah kontrol lampu secara masif (seperti yang terlihat pada log terminal kanan), broker secara cerdas menyaring data tersebut sehingga Subscriber hanya menerima pesan dari kluster temperatur dengan tingkat keandalan QoS 0.
+  Analisis Teknis: Pada kondisi pengujian ini, komponen Subscriber memilih opsi menu 1 (smartroom/sensor/temperature). Meskipun Publisher memancarkan data sensor  kelembapan dan perintah kontrol lampu secara masif (seperti yang terlihat pada log terminal kanan), broker secara cerdas menyaring data tersebut sehingga Subscriber hanya menerima pesan dari kluster temperatur dengan tingkat keandalan QoS 0.
 
 2. Skenario 4: Pengujian Penyaringan Kluster Sensor (Single-Level Wildcard +)
   
    <img width="1868" height="1034" alt="Screenshot 2026-06-10 182251" src="https://github.com/user-attachments/assets/089c3b65-4009-465c-80e3-d61959898bb4" />
 
-        Analisis Teknis: Pada kondisi pengujian ini, Subscriber memilih opsi menu 2 (smartroom/sensor/+). Berdasarkan aturan arsitektur pola routing tree MQTT, karakter wildcard + mengisolasi pencarian hanya pada satu tingkat folder folder. Log terminal siber membuktikan bahwa data smartroom/sensor/temperature (QoS 0) dan smartroom/sensor/humidity (QoS 1) berhasil ditangkap secara bergantian, sementara data aktuasi lampu (smartroom/control/lamp) sepenuhnya disaring keluar dari sistem karena berada pada struktur cabang hierarki yang berbeda.
+    Analisis Teknis: Pada kondisi pengujian ini, Subscriber memilih opsi menu 2 (smartroom/sensor/+). Berdasarkan aturan arsitektur pola routing tree MQTT, karakter wildcard + mengisolasi pencarian hanya pada satu tingkat folder folder. Log terminal siber membuktikan bahwa data smartroom/sensor/temperature (QoS 0) dan smartroom/sensor/humidity (QoS 1) berhasil ditangkap secara bergantian, sementara data aktuasi lampu (smartroom/control/lamp) sepenuhnya disaring keluar dari sistem karena berada pada struktur cabang hierarki yang berbeda.
 
 3. Skenario 5: Pengujian Menangkap Seluruh Data Ruangan (Multi-Level Wildcard #)
 
     <img width="1869" height="1037" alt="Screenshot 2026-06-10 182129" src="https://github.com/user-attachments/assets/7ada4018-942d-4fe9-8013-0ddc9cbc9216" /> 
 
-        Analisis: Pada kondisi pengujian ini, Subscriber memilih opsi menu 3 (smartroom/#). Sesuai dengan spesifikasi pola routing MQTT, wildcard # bersifat multi-level yang mampu menangkap seluruh data tanpa batasan tingkatan hierarki folder di bawah node utama. Log terminal siber membuktikan bahwa seluruh aliran data, baik sensor suhu (QoS 0), kelembapan (QoS 1), hingga perintah kontrol lampu (QoS 2), berhasil diterima secara paralel, simultan, dan lengkap.
+    Analisis: Pada kondisi pengujian ini, Subscriber memilih opsi menu 3 (smartroom/#). Sesuai dengan spesifikasi pola routing MQTT, wildcard # bersifat multi-level yang mampu menangkap seluruh data tanpa batasan tingkatan hierarki folder di bawah node utama. Log terminal siber membuktikan bahwa seluruh aliran data, baik sensor suhu (QoS 0), kelembapan (QoS 1), hingga perintah kontrol lampu (QoS 2), berhasil diterima secara paralel, simultan, dan lengkap.
 
 ---
 
