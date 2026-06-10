@@ -11,6 +11,12 @@ PORT = 1883
 client = mqtt.Client(mqtt.CallbackAPIVersion.VERSION2, client_id="SmartRoom_Publisher")
 client.connect(BROKER, PORT, 60)
 
+# ==================== PERBAIKAN UTAMA ====================
+# Memulai network loop di background agar library paho-mqtt 
+# bisa memproses jabat tangan (handshake) paket QoS 1 & QoS 2
+client.loop_start() 
+# =========================================================
+
 def get_timestamp():
     # Waktu presisi milidetik untuk aspek determinisme waktu CPS
     return datetime.now().strftime("%H:%M:%S.%f")[:-3]
@@ -54,4 +60,5 @@ try:
         
 except KeyboardInterrupt:
     print("\n[INFO] Publisher dimatikan.")
+    client.loop_stop()  # Menghentikan network loop di background secara bersih
     client.disconnect()
