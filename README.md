@@ -11,11 +11,10 @@ Proyek ini mengintegrasikan representasi data fisik lingkungan nyata ke dalam ru
 ![MQTT Protocol](https://img.shields.io/badge/MQTT-v5.0%20%2F%20v3.1.1-660066?style=for-the-badge&logo=mqtt&logoColor=white)
 ![Broker](https://img.shields.io/badge/Eclipse_Mosquitto-v2.x-3C5280?style=for-the-badge&logo=eclipse-mosquitto&logoColor=white)
 ![Platform](https://img.shields.io/badge/Windows-x64-0078D4?style=for-the-badge&logo=windows&logoColor=white)
-![Grade](https://img.shields.io/badge/Academic_Grade-A%2B-success?style=for-the-badge)
 
 ---
 
-## 📖 Daftar Ini (Table of Contents)
+## 📖 Daftar Isi (Table of Contents)
 1. [Deskripsi Proyek](#-deskripsi-proyek)
 2. [Arsitektur Siber-Fisik (CPS Closed-Loop)](#-arsitektur-siber-fisik-cps-closed-loop)
 3. [Manajemen Topik & Matriks QoS](#-manajemen-topik--matriks-qos)
@@ -37,8 +36,11 @@ Berbeda dengan sistem simulasi IoT standar, platform ini mengadopsi prinsip keta
 
 ---
 
-
-
-
 ## 🔄 Arsitektur Siber-Fisik (CPS Closed-Loop)
 Sistem komunikasi ini merepresentasikan siklus umpan balik (*closed-loop system*) yang terintegrasi:
+
+```text
+[ PHYSICAL PLANT ] ──(Sensing via JSON)──> [ MQTT BROKER ] ──(Routing)──> [ CYBER CONTROLLER ]
+  (Kamar Pintar)                             (Mosquitto)                   (Interactive Sub)
+        ▲                                                                          │
+        └─────────────────(Actuation / QoS 2 Command)──────────────────────────────┘
