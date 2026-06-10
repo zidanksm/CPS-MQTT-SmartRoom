@@ -1,11 +1,11 @@
 # 🏢 Smart Room Monitoring & Control via MQTT
 
-Proyek ini merupakan implementasi **Smart Room Monitoring & Control** menggunakan protokol **MQTT** dengan **Eclipse Mosquitto Broker** sebagai pusat komunikasi. Sistem mensimulasikan proses monitoring lingkungan ruangan dan kontrol perangkat melalui arsitektur **Publish–Subscribe**.
+Proyek ini merupakan implementasi **Smart Room Monitoring & Control** menggunakan protokol **MQTT** dengan **Eclipse Mosquitto Broker** sebagai pusat komunikasi. Sistem mensimulasikan proses monitoring lingkungan ruangan dan kontrol perangkat menggunakan arsitektur **Publish–Subscribe**.
 
 Terdapat dua komponen utama:
 
 - **Publisher** → Mengirim data sensor dan kontrol perangkat.
-- **Subscriber** → Menerima serta menampilkan data berdasarkan topik yang dipilih.
+- **Subscriber** → Menerima dan menampilkan data berdasarkan topik yang dipilih.
 
 ---
 
@@ -75,7 +75,7 @@ Buka terminal pertama kemudian jalankan:
 python subscriber.py
 ```
 
-Program akan menampilkan menu pilihan subscription:
+Program akan menampilkan menu berikut:
 
 ```text
 1. smartroom/sensor/temperature
@@ -83,7 +83,7 @@ Program akan menampilkan menu pilihan subscription:
 3. smartroom/#
 ```
 
-Pilih salah satu mode sesuai skenario pengujian yang ingin dilakukan.
+Pilih mode subscription sesuai skenario pengujian yang ingin dilakukan.
 
 ---
 
@@ -95,9 +95,7 @@ Buka terminal kedua kemudian jalankan:
 python publisher.py
 ```
 
-Publisher akan mulai mengirim data Smart Room secara periodik ke beberapa topik MQTT.
-
-Topik yang dipublikasikan:
+Publisher akan mulai mengirim data Smart Room secara periodik ke topik MQTT berikut:
 
 | Topik | Data | QoS |
 |---|---|---|
@@ -113,7 +111,7 @@ Tekan `CTRL + C` pada masing-masing terminal untuk menghentikan Publisher maupun
 
 ---
 
-## 🎯 Mode Subscription Subscriber
+## 🎯 Penjelasan Mode Subscription
 
 | Pilihan | Subscription | Keterangan |
 |---|---|---|
@@ -123,60 +121,12 @@ Tekan `CTRL + C` pada masing-masing terminal untuk menghentikan Publisher maupun
 
 ---
 
-## 📡 Struktur Topik MQTT
-
-```text
-smartroom
-│
-├── sensor
-│   ├── temperature
-│   └── humidity
-│
-└── control
-    └── lamp
-```
-
----
-
-## 📦 Format Payload JSON
-
-### Sensor Suhu
-
-```json
-{
-  "sensor": "suhu",
-  "value": 25.68,
-  "unit": "C"
-}
-```
-
-### Sensor Kelembapan
-
-```json
-{
-  "sensor": "kelembapan",
-  "value": 61.43,
-  "unit": "%"
-}
-```
-
-### Kontrol Lampu
-
-```json
-{
-  "device": "lampu_utama",
-  "command": "ON"
-}
-```
-
----
-
 ## 🧪 Pemetaan Skenario Praktikum
 
 | Skenario Praktikum | Implementasi |
 |---|---|
 | Skenario 1 – Komunikasi Dasar Publisher–Subscriber | Menu 1 |
-| Skenario 2 – Pengujian QoS 0, QoS 1, dan QoS 2 | Publisher |
+| Skenario 2 – QoS 0, QoS 1, dan QoS 2 | Publisher |
 | Skenario 3 – Subscription Topik Spesifik | Menu 1 |
 | Skenario 4 – Wildcard `+` | Menu 2 |
 | Skenario 5 – Wildcard `#` | Menu 3 |
